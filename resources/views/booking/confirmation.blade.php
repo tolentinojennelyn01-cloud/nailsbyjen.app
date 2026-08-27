@@ -20,6 +20,9 @@
         @if ($order->service_location)
             <div class="flex justify-between"><span class="text-gray-500">Location</span><span>{{ $order->serviceLocationLabel() }}</span></div>
         @endif
+        @if ($order->service_address)
+            <div class="flex justify-between"><span class="text-gray-500">Address</span><span>{{ $order->service_address }}</span></div>
+        @endif
         @if ($order->preferred_date)
             <div class="flex justify-between"><span class="text-gray-500">Preferred date</span><span>{{ $order->preferred_date->format('M d, Y') }}</span></div>
         @endif
@@ -29,6 +32,10 @@
         <hr class="border-rose-200">
         <div class="flex justify-between font-bold text-rose-600"><span>Estimated total</span><span>₱{{ number_format($order->total_price, 2) }}</span></div>
     </div>
+
+    @if ($order->service_location === 'home_service')
+        <p class="text-xs text-gray-400 mt-4">This total doesn't include the home service fee yet — Jen will check your address and confirm that amount with you.</p>
+    @endif
 
     <a href="{{ route('booking.create') }}" class="inline-block mt-6 text-sm text-rose-500 hover:underline">Book another set</a>
 </div>

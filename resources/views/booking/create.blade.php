@@ -62,6 +62,7 @@
                 <div class="grid sm:grid-cols-2 gap-3">
                     <label class="flex items-start gap-3 border-2 rounded-xl px-4 py-3 cursor-pointer transition-colors {{ old('service_location') === 'home_service' ? 'border-gold-400 bg-rose-50/70' : 'border-rose-200' }} has-[:checked]:border-gold-400 has-[:checked]:bg-rose-50/70">
                         <input type="radio" name="service_location" value="home_service" required
+                            x-model="serviceLocation"
                             @checked(old('service_location') === 'home_service') class="mt-1 text-rose-500 focus:ring-rose-400">
                         <span>
                             <span class="block font-medium text-sm">Home Service</span>
@@ -70,12 +71,22 @@
                     </label>
                     <label class="flex items-start gap-3 border-2 rounded-xl px-4 py-3 cursor-pointer transition-colors {{ old('service_location') === 'home_base' ? 'border-gold-400 bg-rose-50/70' : 'border-rose-200' }} has-[:checked]:border-gold-400 has-[:checked]:bg-rose-50/70">
                         <input type="radio" name="service_location" value="home_base"
+                            x-model="serviceLocation"
                             @checked(old('service_location') === 'home_base') class="mt-1 text-rose-500 focus:ring-rose-400">
                         <span>
                             <span class="block font-medium text-sm">Home Base</span>
                             <span class="block text-xs text-plum-400">You come to Jen's place in Paliparan 2, Dasmariñas</span>
                         </span>
                     </label>
+                </div>
+
+                {{-- Address, shown only for Home Service --}}
+                <div x-show="serviceLocation === 'home_service'" x-cloak class="mt-3">
+                    <label class="block text-sm mb-1">Your address (city / barangay)</label>
+                    <input type="text" name="service_address" value="{{ old('service_address') }}"
+                        placeholder="e.g. Barangay Paliparan 3, Dasmariñas City"
+                        class="w-full rounded-lg border-2 border-rose-300 focus:border-rose-500 focus:ring-rose-400">
+                    <p class="text-xs text-plum-400 mt-1">A home service fee applies based on distance — Jen will confirm the exact amount once she reviews your address.</p>
                 </div>
             </div>
         </fieldset>
@@ -260,12 +271,18 @@
                 <span x-text="'₱' + (removalOption ? pricing.removal[removalOption].price : 0)"></span>
             </div>
 
+            <div class="flex justify-between text-sm text-plum-400 italic" x-show="serviceLocation === 'home_service'">
+                <span>Home service fee</span>
+                <span>TBD</span>
+            </div>
+
             <hr class="border-gold-200">
             <div class="flex justify-between font-serif font-semibold text-xl text-rose-600">
                 <span>Total</span>
                 <span x-text="'₱' + total"></span>
             </div>
-            <p class="text-xs text-plum-400">Final price confirmed by Jen once the design is finalized in person.</p>
+            <p class="text-xs text-plum-400" x-show="serviceLocation === 'home_service'">Home service fee not yet included — Jen will confirm it based on your address.</p>
+            <p class="text-xs text-plum-400" x-show="serviceLocation !== 'home_service'">Final price confirmed by Jen once the design is finalized in person.</p>
         </div>
     </aside>
 </div>
@@ -274,6 +291,7 @@
 function bookingForm(pricing) {
     return {
         pricing: pricing,
+        serviceLocation: '{{ old('service_location') }}',
         baseService: '',
         hasFullSetDesign: false,
         fullSetDesignType: '',

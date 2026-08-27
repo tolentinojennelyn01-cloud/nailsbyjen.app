@@ -33,6 +33,7 @@ class OrderController extends Controller
             'preferred_date'         => ['nullable', 'date'],
             'preferred_time'         => ['nullable', 'date_format:H:i'],
             'service_location'       => ['nullable', 'in:home_service,home_base'],
+            'service_address'        => ['required_if:service_location,home_service', 'nullable', 'string', 'max:255'],
             'base_service'           => ['required', 'in:' . implode(',', array_keys($pricing['base_services']))],
             'has_full_set_design'    => ['nullable', 'boolean'],
             'full_set_design_type'   => ['nullable', 'in:' . implode(',', array_keys($pricing['full_set_designs']))],
@@ -88,6 +89,7 @@ class OrderController extends Controller
             'preferred_date' => $validated['preferred_date'] ?? null,
             'preferred_time' => $validated['preferred_time'] ?? null,
             'service_location' => $validated['service_location'] ?? null,
+            'service_address' => $validated['service_address'] ?? null,
             'base_service' => $baseService,
             'base_price' => $basePrice,
             'has_full_set_design' => $hasFullSetDesign,
@@ -141,6 +143,33 @@ class OrderController extends Controller
     public function show(Order $order)
     {
         return view('admin.orders.show', compact('order'));
+    }
+
+    /**
+     * Admin: set/adjust the home service travel fee once Jen has checked
+     * the customer's address. Recomputes total_price from scratch so it
+     * always reflects the current fee, not a stale add-on.
+     */
+    public function updateHomeServiceFee(Request $request, Order $order)
+    {
+        $validated = $request->validate([
+            'home_service_fee' => ['required', 'numeric', 'min:0', 'max:99999'],
+        ]);
+
+        $newFee = $validated['home_service_fee'];
+
+        $newTotal = $order->base_price
+            + $order->full_set_design_price
+            + $order->addons_total
+            + $order->removal_price
+            + $newFee;
+
+        $order->update([
+            'home_service_fee' => $newFee,
+            'total_price' => $newTotal,
+        ]);
+
+        return back()->with('success', 'Home service fee updated.');
     }
 
     public function updateStatus(Request $request, Order $order)

@@ -18,6 +18,9 @@
             <p><span class="text-gray-400">Preferred date:</span> {{ optional($order->preferred_date)->format('M d, Y') ?? '—' }}</p>
             <p><span class="text-gray-400">Preferred time:</span> {{ optional($order->preferred_time)->format('g:i A') ?? '—' }}</p>
             <p><span class="text-gray-400">Location:</span> {{ $order->serviceLocationLabel() }}</p>
+            @if ($order->service_address)
+                <p class="sm:col-span-2"><span class="text-gray-400">Address:</span> {{ $order->service_address }}</p>
+            @endif
             <p><span class="text-gray-400">Length:</span> {{ ucfirst($order->nail_length ?? '—') }}</p>
             <p><span class="text-gray-400">Shape:</span> {{ $order->nail_shape ?? '—' }}</p>
             <p><span class="text-gray-400">Color:</span> {{ $order->nail_color ?? '—' }}</p>
@@ -48,6 +51,17 @@
                     <span>₱{{ number_format($order->removal_price, 2) }}</span>
                 </div>
             @endif
+            @if ($order->service_location === 'home_service')
+                <div class="flex justify-between">
+                    <span>
+                        Home service fee
+                        @if ((float) $order->home_service_fee === 0.0)
+                            <span class="text-amber-600 text-xs">(not set yet)</span>
+                        @endif
+                    </span>
+                    <span>₱{{ number_format($order->home_service_fee, 2) }}</span>
+                </div>
+            @endif
             <hr class="border-rose-100">
             <div class="flex justify-between font-bold text-rose-600 text-base">
                 <span>Total</span>
@@ -70,6 +84,19 @@
                         class="max-h-64 rounded-xl border border-rose-100 shadow-sm hover:opacity-90 transition-opacity">
                 </a>
             </div>
+        @endif
+
+        @if ($order->service_location === 'home_service')
+            <form method="POST" action="{{ route('admin.orders.updateHomeServiceFee', $order) }}" class="flex items-center gap-2 pt-2 border-t border-rose-100 mt-2">
+                @csrf
+                @method('PATCH')
+                <label class="text-sm text-gray-500 shrink-0">Home service fee</label>
+                <span class="text-sm text-gray-400">₱</span>
+                <input type="number" name="home_service_fee" step="0.01" min="0"
+                    value="{{ old('home_service_fee', $order->home_service_fee) }}"
+                    class="w-28 rounded-lg border-gray-300 text-sm focus:border-rose-400 focus:ring-rose-400">
+                <button class="bg-rose-500 hover:bg-rose-600 text-white text-sm rounded-lg px-4 py-2">Save fee</button>
+            </form>
         @endif
 
         <form method="POST" action="{{ route('admin.orders.updateStatus', $order) }}" class="flex items-center gap-2 pt-2">
