@@ -1,0 +1,10 @@
+.git
+.env
+node_modules
+vendor
+database/*.sqlite
+storage/app/public/inspo
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/logs/*
