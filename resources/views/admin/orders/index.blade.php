@@ -6,13 +6,19 @@
 <div class="space-y-6">
     <div class="flex flex-wrap items-center justify-between gap-3">
         <h1 class="font-serif text-2xl font-semibold text-rose-600">My bookings</h1>
-        <div class="flex gap-2 text-xs">
-            @foreach (['' => 'All', 'pending' => 'Pending', 'confirmed' => 'Confirmed', 'done' => 'Done', 'cancelled' => 'Cancelled'] as $value => $label)
-                <a href="{{ route('admin.orders.index', array_filter(['status' => $value ?: null, 'search' => $search])) }}"
-                   class="px-3 py-1 rounded-full border {{ $status === $value ? 'bg-rose-500 text-white border-rose-500' : 'border-gray-200 text-plum-400 hover:border-rose-300' }}">
-                    {{ $label }}
-                </a>
-            @endforeach
+        <div class="flex items-center gap-3">
+            <div class="flex gap-2 text-xs">
+                @foreach (['' => 'All', 'pending' => 'Pending', 'confirmed' => 'Confirmed', 'done' => 'Done', 'cancelled' => 'Cancelled'] as $value => $label)
+                    <a href="{{ route('admin.orders.index', array_filter(['status' => $value ?: null, 'search' => $search])) }}"
+                       class="px-3 py-1 rounded-full border {{ $status === $value ? 'bg-rose-500 text-white border-rose-500' : 'border-gray-200 text-plum-400 hover:border-rose-300' }}">
+                        {{ $label }}
+                    </a>
+                @endforeach
+            </div>
+            <form method="POST" action="{{ route('admin.logout') }}">
+                @csrf
+                <button type="submit" class="text-xs text-plum-400 hover:text-rose-600 underline">Log out</button>
+            </form>
         </div>
     </div>
 
